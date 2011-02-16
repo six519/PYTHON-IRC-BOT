@@ -86,7 +86,22 @@ class PYTHONIRC:
 
                 elif re.search("PING :",buffer):
                     self.__sendMessage(buffer.replace("PING","PONG"))
+
+                elif re.search("PRIVMSG #" + self.__IrcRoom + " :",buffer):
+
+                    #handle room message here
+                    pass
+
+                elif re.search("JOIN :#" + self.__IrcRoom,buffer):
+                    #greet new user
+
+                    tempStr = buffer.split(":")
+                    tempStr = tempStr[1].split("!")
+                    nick = tempStr[0]
                     
+                    if self.__IrcNick != nick:
+                        self.__sendMessage("PRIVMSG #" + self.__IrcRoom + " :Magandang araw sa iyo " + nick + "\r\n")
+                        
 
 
     def __sendMessage(self,msg):
