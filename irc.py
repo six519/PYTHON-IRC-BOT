@@ -1,6 +1,7 @@
 # This is my hello world code in python :)
 import socket
 import re
+import time
 
 class PYTHONIRC:
 
@@ -100,17 +101,38 @@ class PYTHONIRC:
                     nick = tempStr[0]
                     
                     if self.__IrcNick != nick:
-                        self.__sendMessage("PRIVMSG #" + self.__IrcRoom + " :Magandang araw sa iyo " + nick + "\r\n")
+                        self.__sendMessage("PRIVMSG #" + self.__IrcRoom + " :Magandang " + self.__getMeridiem() + " sa iyo " + nick + "\r\n")
                         
 
 
     def __sendMessage(self,msg):
         self.__socket.send(msg.encode())
-                
+        
+    def __getMeridiem(self,**kwargs):
 
-            
-            
+        nowTime = time.localtime()
 
+        try:
+            nowTime = time.localtime(time.time() + (kwargs['HoursToAdd'] * 3600))
+        except KeyError:
+            pass
+        
+        try:
+            nowTime = time.localtime(time.time() - (kwargs['HoursToSub'] * 3600))
+        except KeyError:
+            pass
 
+        if nowTime.tm_hour == 0:
+            return "hatinggabi"
+        elif nowTime.tm_hour >= 1 and nowTime.tm_hour <=5:
+            return "madaling araw"
+        elif nowTime.tm_hour >=6 and nowTime.tm_hour <= 11:
+            return "umaga"
+        elif nowTime.tm_hour == 12:
+            return "tanghali"
+        elif nowTime.tm_hour >= 13 and nowTime.tm_hour <= 17:
+            return "hapon"
+        elif nowTime.tm_hour >= 18 and nowTime.tm_hour <= 23:
+            return "gabi"
 
 run = PYTHONIRC()
