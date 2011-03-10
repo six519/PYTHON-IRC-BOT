@@ -96,9 +96,7 @@ class PYTHONIRC:
                 elif re.search("JOIN :#" + self.__IrcRoom,buffer):
                     #greet new user
 
-                    tempStr = buffer.split(":")
-                    tempStr = tempStr[1].split("!")
-                    nick = tempStr[0]
+                    nick = self.__extractNick(buffer)
                     
                     if self.__IrcNick != nick:
                         self.__sendMessage("PRIVMSG #" + self.__IrcRoom + " :Magandang " + self.__getMeridiem() + " sa iyo " + nick + "\r\n")
@@ -107,6 +105,13 @@ class PYTHONIRC:
 
     def __sendMessage(self,msg):
         self.__socket.send(msg.encode())
+    
+    def __extractNick(self,str):
+
+        tempStr = str.split(":")
+        tempStr = tempStr[1].split("!")
+        return tempStr[0]    	  
+			
         
     def __getMeridiem(self,**kwargs):
 
