@@ -46,7 +46,7 @@ class PYTHONIRC:
             self.__receiveMessages()
             
         except (socket.gaierror,socket.error) as err:
-            print("Connection error. The following error occur:",err)
+            print("Connection error. The following error occured:",err)
 
             if self.__getUserInput("Restart application? Enter y to restart") == "y":
                 self.__main()
