@@ -2,6 +2,8 @@
 import socket
 import re
 import time
+from plugin import Plugin, IrcConfig
+
 
 class PYTHONIRC:
 
@@ -12,19 +14,30 @@ class PYTHONIRC:
     __socket = None
     __isConnected = False
     __isAuthenticated = False
+    __plugins = []
+
+    # marks whether we can skip initialization
+    # eg setting server/nick/channel
+    # useful in plugins which defines their own
+    # initializations
+    doInit = True
 
 
     def __init__(self):
+        #load the plugins
+        self.__plugins = [IrcConfig()]
         self.__main()
 
     def __main(self):
-        self.__IrcServer = self.__getUserInput("Please Enter Irc Server Address")
+        self.notifyPlugins("beforeInit");
+        if self.doInit :
+            self.__IrcServer = self.__getUserInput("Please Enter Irc Server Address")
 
-        if self.__getUserInput("Do you want to change the Irc Port? The default port is " + self.__IrcPort + ". Enter y to change") == "y":
-            self.__IrcPort = self.__getUserInput("Please enter port number", "6667")
+            if self.__getUserInput("Do you want to change the Irc Port? The default port is " + self.__IrcPort + ". Enter y to change") == "y":
+                self.__IrcPort = self.__getUserInput("Please enter port number", "6667")
 
-        self.__IrcNick = self.__getUserInput("Please enter Irc nick")
-        self.__IrcRoom = self.__getUserInput("Please enter Irc channel")
+            self.__IrcNick = self.__getUserInput("Please enter Irc nick")
+            self.__IrcRoom = self.__getUserInput("Please enter Irc channel")
         self.__connect()
 
     def __getUserInput(self,msg, default=""):
@@ -134,5 +147,7 @@ class PYTHONIRC:
             return "hapon"
         elif nowTime.tm_hour >= 18 and nowTime.tm_hour <= 23:
             return "gabi"
-
+    def notifyPlugins (self, event):
+        for p in self.__plugins:
+            p.beforeInit(self)
 run = PYTHONIRC()
