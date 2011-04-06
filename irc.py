@@ -21,22 +21,17 @@ class PYTHONIRC:
         self.__IrcServer = self.__getUserInput("Please Enter Irc Server Address")
 
         if self.__getUserInput("Do you want to change the Irc Port? The default port is " + self.__IrcPort + ". Enter y to change") == "y":
-            self.__IrcPort = self.__getUserInput("Please enter port number")
+            self.__IrcPort = self.__getUserInput("Please enter port number", "6667")
 
         self.__IrcNick = self.__getUserInput("Please enter Irc nick")
         self.__IrcRoom = self.__getUserInput("Please enter Irc channel")
         self.__connect()
 
-    def __getUserInput(self,msg):
-
-
-        while True:
-            line = input("\n" + msg + ": ")
-
-            if len(line.strip()) > 0:
-                return line.strip()
-                break;
-
+    def __getUserInput(self,msg, default=""):
+        line = raw_input(msg + ": ")
+        if len(line.strip()) > 0:
+            return line.strip()
+        return default
     def __connect(self):
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
