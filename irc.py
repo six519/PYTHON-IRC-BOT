@@ -1,7 +1,7 @@
 # @todo automate sending alternate nick
 import socket
 import re
-from plugin import Plugin, IrcConfig, IrcGreeter
+from plugin import Plugin, IrcConfig, IrcGreeter, News
 
 class PYTHONIRC:
 
@@ -24,7 +24,7 @@ class PYTHONIRC:
     def __init__(self):
         try:
             #load the plugins
-            self.plugins = [IrcConfig(), IrcGreeter()]
+            self.plugins = [IrcConfig(), IrcGreeter(), News()]
             self.__main()
         except KeyboardInterrupt:
             self.shutdown()
@@ -107,15 +107,19 @@ class PYTHONIRC:
                     nick = self.__extractNick(buffer)
                     self.notifyPlugins("onJoin", self.IrcRoom, nick, buffer)
 
-    def sendMessage(self,msg):
-        self.socket.send(msg.encode())
+    def sendMessage(self,msg, encode = True):
+        if encode:
+            self.socket.send(msg.encode())
+        self.socket.send(msg)
     
     def __extractNick(self,str):
 
         tempStr = str.split(":")
         tempStr = tempStr[1].split("!")
         return tempStr[0]    	  
-			
+    def extractMsg(self, privmsg):
+        tmp = privmsg.split(":");
+        return tmp[len(tmp) - 1].strip();
     def notifyPlugins (self, event, *args):
         for p in self.plugins:
             getattr(p, event)(self, *args)

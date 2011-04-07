@@ -1,5 +1,9 @@
 #Greeter needs the time module
 import time
+#New plugin imports
+import subprocess
+import re
+
 class Plugin:
     def __init__(self):
         pass
@@ -18,9 +22,24 @@ class IrcConfig(Plugin):
     def beforeInit(self, irc):
         irc.IrcServer = "irc.freenode.net"
         irc.IrcPort   = "6667"
-        irc.IrcRoom   = "phpugph"
-        irc.IrcNick   = "modifiedBot"
+        irc.IrcRoom   = "phpugph2"
+        irc.IrcNick   = "modifiedBotx"
         irc.doInit    = False
+class News(Plugin):
+    def __init__(self):
+        Plugin.__init__(self)
+    def getLatest(self):
+        p = subprocess.Popen(["./curl.sh"], stdout=subprocess.PIPE)
+        out,err = p.communicate()
+        return out.split("\n")
+    def onPriv(self, irc, channel, nick, msg):
+        msg = irc.extractMsg(msg)
+        if msg != "!news":
+            return
+        str = self.getLatest()
+        for s in str:
+            cmd = "PRIVMSG #%s :%s\r\n" % (channel, s)
+            irc.sendMessage(re.sub(r"[^\w]", '', cmd), False)
 
 class IrcGreeter(Plugin):
     def __init__(self):
