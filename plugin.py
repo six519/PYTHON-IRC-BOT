@@ -51,7 +51,9 @@ class News(Plugin):
     def __init__(self):
         Plugin.__init__(self)
     def getLatest(self):
-        p = subprocess.Popen(["./curl.sh"], stdout=subprocess.PIPE)
+        user = self.getConfig('News', 'username')
+        passwd = self.getConfig('News', 'password')
+        p = subprocess.Popen(["./curl.sh", user , passwd], stdout=subprocess.PIPE)
         out,err = p.communicate()
         return out.split("\n")
     def onPriv(self, irc, channel, nick, msg):
