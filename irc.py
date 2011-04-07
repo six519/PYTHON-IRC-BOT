@@ -1,7 +1,8 @@
 # @todo automate sending alternate nick
 import socket
 import re
-from plugin import Plugin, IrcConfig, IrcGreeter, News
+import plugin
+from plugin import IrcConfig
 
 class PYTHONIRC:
 
@@ -23,12 +24,27 @@ class PYTHONIRC:
 
     def __init__(self):
         try:
-            #load the plugins
-            self.plugins = [IrcConfig(), IrcGreeter(), News()]
+            
+            #load the Config Plugin
+            cfg = IrcConfig()
+            load_plugins =  cfg.configure(self, 'irc.ini')
+            self.plugins.append(cfg)
+            
+            #load all other plugins
+            if load_plugins:
+                imp = cfg.getConfig('irc', 'plugins').split(',')
+                self.loadPlugins(imp, cfg.conf)
+            else:
+                print "Plugins loading skipped" 
             self.__main()
         except KeyboardInterrupt:
             self.shutdown()
-
+    def loadPlugins(self, list, irc_conf): 
+        for p in list:
+            inst = getattr(globals()['plugin'], p)()
+            inst.setConfig(irc_conf)
+            self.plugins.append(inst)
+        
     def shutdown(self):
         #do shutdown fn here
         print "Shutting down"

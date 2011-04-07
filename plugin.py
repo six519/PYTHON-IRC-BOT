@@ -1,3 +1,5 @@
+#IrcConfig imports
+import ConfigParser
 #Greeter needs the time module
 import time
 #New plugin imports
@@ -5,6 +7,7 @@ import subprocess
 import re
 
 class Plugin:
+    conf = None
     def __init__(self):
         pass
     def beforeInit(self, irc):
@@ -15,16 +18,35 @@ class Plugin:
         pass
     def onPriv(self, irc, channel, nick, msg):
         pass
+    def configure(self, irc, conf):
+        cp = ConfigParser.SafeConfigParser();
+        try:
+            fp = open(conf)
+        except IOError:
+            return False
+        cp.readfp(fp)
+        self.conf = cp
+        return True
+    def getConfig(self, section, cfg = None):
+        try:
+            if cfg == None:
+                return self.conf.items(section)
+            return self.conf.get(section, cfg)
+        except ConfigParser.NoSectionError:
+            return None
+    def setConfig(self, cfg):
+        self.conf = cfg
 
 class IrcConfig(Plugin):
     def __init__(self):
         Plugin.__init__(self)
     def beforeInit(self, irc):
-        irc.IrcServer = "irc.freenode.net"
-        irc.IrcPort   = "6667"
-        irc.IrcRoom   = "phpugph2"
-        irc.IrcNick   = "modifiedBotx"
-        irc.doInit    = False
+        irc.IrcNick     = self.getConfig('IrcConfig', 'nick')
+        irc.IrcServer   = self.getConfig('IrcConfig', 'server')
+        irc.IrcRoom     = self.getConfig('IrcConfig', 'channel')
+        irc.IrcPort     = self.getConfig('IrcConfig', 'port')
+        irc.doInit      = False
+         
 class News(Plugin):
     def __init__(self):
         Plugin.__init__(self)
@@ -73,3 +95,9 @@ class IrcGreeter(Plugin):
             return "hapon"
         elif nowTime.tm_hour >= 18 and nowTime.tm_hour <= 23:
             return "gabi"
+
+class Test(Plugin):
+    def __init__(self):
+        Plugin.__init__(self)
+    def beforeInit(self, irc):
+        print self.getConfig('Test', 'foo')
