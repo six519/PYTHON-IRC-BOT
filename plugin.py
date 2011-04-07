@@ -61,7 +61,7 @@ class News(Plugin):
         str = self.getLatest()
         for s in str:
             cmd = "PRIVMSG #%s :%s\r\n" % (channel, s)
-            irc.sendMessage(re.sub(r"[^\w]", '', cmd), False)
+            irc.sendMessage(cmd, False)
 
 class IrcGreeter(Plugin):
     def __init__(self):
