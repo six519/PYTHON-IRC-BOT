@@ -83,7 +83,7 @@ class PYTHONIRC:
     def __receiveMessages(self):
         while self.isConnected == True:
             buffer = self.socket.recv(1024)
-            buffer = buffer.decode("utf-8")
+            buffer = buffer.decode("utf-8", 'replace')
 
             if buffer == "":
                 self.isConnected = False
