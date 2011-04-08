@@ -2,7 +2,9 @@
 import socket
 import re
 import plugin
-from plugin import IrcConfig
+import plugins
+from plugins.ircconfig import IrcConfig
+
 
 class PYTHONIRC:
 
@@ -41,7 +43,9 @@ class PYTHONIRC:
             self.shutdown()
     def loadPlugins(self, list, irc_conf): 
         for p in list:
-            inst = getattr(globals()['plugin'], p)()
+            m = __import__('plugins.'+p.lower(), globals(), locals(), [p])
+            print "Plugin", p, "loaded"
+            inst = getattr(m, p)()
             inst.setConfig(irc_conf)
             self.plugins.append(inst)
         
