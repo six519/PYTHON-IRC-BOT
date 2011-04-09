@@ -31,5 +31,7 @@ class Plugin:
             return None
     def setConfig(self, cfg):
         self.conf = cfg
-    def shutDown(self, irc):
+    def init(self, irc):
+        pass
+    def shutdown(self, irc):
         pass

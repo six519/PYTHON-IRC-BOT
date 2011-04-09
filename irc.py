@@ -48,10 +48,10 @@ class PYTHONIRC:
             inst = getattr(m, p)()
             inst.setConfig(irc_conf)
             self.plugins.append(inst)
-        
+        self.notifyPlugins("init")
     def shutdown(self):
         #do shutdown fn here
-        print "Shutting down"
+        self.notifyPlugins("shutdown")
     def __main(self):
         self.notifyPlugins("beforeInit");
         if self.doInit :
