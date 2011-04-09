@@ -129,7 +129,8 @@ class PYTHONIRC:
     def sendMessage(self,msg, encode = True):
         if encode:
             self.socket.send(msg.encode())
-        self.socket.send(msg)
+        else: 
+            self.socket.send(msg)
     
     def __extractNick(self,str):
 
