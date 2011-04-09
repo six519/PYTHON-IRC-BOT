@@ -94,8 +94,7 @@ class PYTHONIRC:
                 self.isAuthenticated = False
 
             else:
-                print(buffer)
-
+                self.notifyPlugins("onRecv", buffer)
                 if re.search("Checking Ident",buffer) and not self.isAuthenticated:
                     self.sendMessage("NICK " + self.IrcNick + "\r\n")
                     self.sendMessage("USER " + self.IrcNick + " \"" + self.IrcNick + ".com\" \"" + self.IrcServer + "\" :" + self.IrcNick + " robot\r\n")

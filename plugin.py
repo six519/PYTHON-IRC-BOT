@@ -13,6 +13,8 @@ class Plugin:
         pass
     def onPriv(self, irc, channel, nick, msg):
         pass
+    def onRecv(self, irc, msg):
+        pass
     def configure(self, irc, conf):
         cp = ConfigParser.SafeConfigParser();
         try:
