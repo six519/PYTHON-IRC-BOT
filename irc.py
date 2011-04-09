@@ -52,6 +52,7 @@ class PYTHONIRC:
     def shutdown(self):
         #do shutdown fn here
         self.notifyPlugins("shutdown")
+        self.sendMessage("QUIT :I'm sleepy\r\n")
     def __main(self):
         self.notifyPlugins("beforeInit");
         if self.doInit :
