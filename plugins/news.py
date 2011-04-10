@@ -1,17 +1,20 @@
 from plugin import Plugin
 from HTMLParser import HTMLParser
+import urllib2
 from urllib2 import urlopen,Request,build_opener,HTTPCookieProcessor,install_opener
 from urllib import urlencode
 from cookielib import LWPCookieJar
+import json
 import re
+import threading
 
 class PhpugphParser(HTMLParser):
-    link_count = 0
     latest = []
     current = {}
     is_post = False
     is_profile = False
     def __init__(self):
+        self.latest = []
         HTMLParser.__init__(self)
     def handle_starttag(self, tag, attrs):
         if tag == 'a' and attrs:
@@ -35,12 +38,37 @@ class PhpugphParser(HTMLParser):
             self.latest.append(self.current)
             self.current = {}
     def handle_endtag(self, tag):
-            pass
+        pass
+
+class GoogleShortener(threading.Thread):
+    longurl = ""
+    callback = None
+    args = None
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def shorten_and_do(self, longurl, callback, *args):
+        self.longurl = longurl
+        self.callback = callback
+        self.args = args
+        self.start()
+    def run(self):
+        s = self.shorten(self.longurl)
+        self.callback(s, *self.args)
+    def shorten(self, longurl):
+        service_url = 'https://www.googleapis.com/urlshortener/v1/url'
+        data = '{"longUrl": "%s"}' % (longurl,)
+        headers = {'Content-type': 'application/json'}
+
+        req = urllib2.Request(service_url, data, headers)
+        resp = urllib2.urlopen(req)
+        doc = resp.read()
+        v = json.loads(doc)
+        return v['id']
 
 class News(Plugin):
     def __init__(self):
         Plugin.__init__(self)
-    def getLatest(self):
+    def printLatest(self, channel, irc):
         user = self.getConfig('News', 'username')
         passwd = self.getConfig('News', 'password')
         cookie = 'cookie.jar'
@@ -64,16 +92,16 @@ class News(Plugin):
         f.close()
         
         lines = []
-        for l in parser.latest:
-            str = "%s (%s)" % (l['topic'], l['by'])
-            lines.append(str)
-        return lines
+        latest = parser.latest
+        for l in latest:
+            g = GoogleShortener()
+            g.shorten_and_do(l['link'], self.pretty_print, l, channel, irc)
         
+    def pretty_print(self, url, obj, channel, irc):
+        cmd = "PRIVMSG #%s :%s (%s) - [ %s ]\r\n" % (channel, obj['topic'], obj['by'], url)
+        irc.sendMessage(cmd, False)
     def onPriv(self, irc, channel, nick, msg):
         msg = irc.extractMsg(msg)
         if msg != "!news":
             return
-        str = self.getLatest()
-        for s in str:
-            cmd = "PRIVMSG #%s :%s\r\n" % (channel, s)
-            irc.sendMessage(cmd, False)
+        str = self.printLatest(channel, irc)
