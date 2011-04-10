@@ -16,6 +16,7 @@ class PYTHONIRC:
     isConnected = False
     isAuthenticated = False
     plugins = []
+    plugins_loaded = False
 
     # marks whether we can skip initialization
     # eg setting server/nick/channel
@@ -36,6 +37,7 @@ class PYTHONIRC:
             if load_plugins:
                 imp = cfg.getConfig('irc', 'plugins').split(',')
                 self.loadPlugins(imp, cfg.conf)
+                self.plugins_loaded = True
             else:
                 print "Plugins loading skipped" 
             self.__main()
@@ -142,6 +144,8 @@ class PYTHONIRC:
         tmp = privmsg.split(":");
         return tmp[len(tmp) - 1].strip();
     def notifyPlugins (self, event, *args):
+        if not self.plugins_loaded:
+            return 
         for p in self.plugins:
             getattr(p, event)(self, *args)
 run = PYTHONIRC()
