@@ -37,7 +37,6 @@ class PYTHONIRC:
             if load_plugins:
                 imp = cfg.getConfig('irc', 'plugins').split(',')
                 self.loadPlugins(imp, cfg.conf)
-                self.plugins_loaded = True
             else:
                 print "Plugins loading skipped" 
             self.__main()
@@ -51,6 +50,7 @@ class PYTHONIRC:
             inst.setConfig(irc_conf)
             self.plugins.append(inst)
         self.notifyPlugins("init")
+        self.plugins_loaded = True
     def shutdown(self):
         #do shutdown fn here
         self.notifyPlugins("shutdown")
@@ -144,7 +144,7 @@ class PYTHONIRC:
         tmp = privmsg.split(":");
         return tmp[len(tmp) - 1].strip();
     def notifyPlugins (self, event, *args):
-        if not self.plugins_loaded:
+        if not self.plugins_loaded and event != 'init':
             return 
         for p in self.plugins:
             getattr(p, event)(self, *args)
