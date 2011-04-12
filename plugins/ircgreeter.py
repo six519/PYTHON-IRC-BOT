@@ -6,17 +6,13 @@ class IrcGreeter(Plugin):
 
     def onJoin(self, irc, channel, nick, msg):
         if irc.IrcNick != nick :
-            irc.sendMessage("PRIVMSG #" + channel + " :Magandang " + self.getMeridiem() + " sa iyo " + nick + "\r\n")
+            gmt_offset = int(self.getConfig('IrcGreeter', 'gmt_offset'))
+            irc.sendMessage("PRIVMSG #" + channel + " :Magandang " + self.getMeridiem(HoursToAdd=gmt_offset) + " sa iyo " + nick + "\r\n")
     def getMeridiem(self,**kwargs):
         nowTime = time.localtime()
 
         try:
             nowTime = time.localtime(time.time() + (kwargs['HoursToAdd'] * 3600))
-        except KeyError:
-            pass
-        
-        try:
-            nowTime = time.localtime(time.time() - (kwargs['HoursToSub'] * 3600))
         except KeyError:
             pass
 
