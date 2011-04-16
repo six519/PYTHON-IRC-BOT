@@ -6,6 +6,8 @@ class IrcCow(Plugin):
         Plugin.__init__(self)
         pass
     def do(self, type, msg):
+        #remove  possible commandline arguments
+        msg = re.sub(r"-.", "", msg)
         p = subprocess.Popen([type, msg], stdout=subprocess.PIPE)
         out,err = p.communicate()
         return out.split("\n")
