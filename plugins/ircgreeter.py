@@ -3,20 +3,31 @@ import time
 class IrcGreeter(Plugin):
     def __init__(self):
         Plugin.__init__(self)
-
     def onJoin(self, irc, channel, nick, msg):
-        if irc.IrcNick != nick :
-            irc.sendMessage("PRIVMSG #" + channel + " :Magandang " + self.getMeridiem() + " sa iyo " + nick + "\r\n")
+        # this is the bot joining
+        if irc.IrcNick == nick :
+           return
+        #cowgreet?
+        gmt_offset = int(self.getConfig('IrcGreeter', 'gmt_offset'))
+        msg = "Magandang %s sa iyo %s" % (self.getMeridiem(HoursToAdd=gmt_offset), nick)
+        msgs = []
+        do_cowgreet = self.getConfig('IrcGreeter', 'cowgreet')
+
+        if do_cowgreet:
+            for i in irc.plugins:
+                if i.__class__.__name__ == 'IrcCow':
+                    msgs = i.do('cowsay', msg)
+
+        else:
+            msgs.append(msg)
+
+        for i in msgs:
+            irc.sendMessage("PRIVMSG #%s :%s\r\n" %(channel, i))
     def getMeridiem(self,**kwargs):
         nowTime = time.localtime()
 
         try:
             nowTime = time.localtime(time.time() + (kwargs['HoursToAdd'] * 3600))
-        except KeyError:
-            pass
-        
-        try:
-            nowTime = time.localtime(time.time() - (kwargs['HoursToSub'] * 3600))
         except KeyError:
             pass
 
