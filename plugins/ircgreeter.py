@@ -11,7 +11,7 @@ class IrcGreeter(Plugin):
         gmt_offset = int(self.getConfig('IrcGreeter', 'gmt_offset'))
         msg = "Magandang %s sa iyo %s" % (self.getMeridiem(HoursToAdd=gmt_offset), nick)
         msgs = []
-        do_cowgreet = self.getConfig('IrcGreeter', 'cowgreet')
+        do_cowgreet = self.getConfigBoolean('IrcGreeter', 'cowgreet')
 
         if do_cowgreet:
             for i in irc.plugins:
