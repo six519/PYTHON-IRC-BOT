@@ -122,7 +122,7 @@ class PYTHONIRC:
                 elif re.search("PING :", buffer):
                     self.sendMessage(buffer.replace("PING","PONG"))
 
-                elif re.search("NOTICE #" + self.IrcRoom + " :", buffer):
+                elif re.match(":(?P<nick>.*?)!\S+\s+?NOTICE\s+[#]?(?P<channel>[-\w]+)\s+:(?P<message>[^\n\r]+)", buffer):
                     pass # Bots should generally ignore NOTICEs
                 elif re.search("PRIVMSG #" + self.IrcRoom + " :", buffer):
                     nick = self.__extractNick(buffer)
