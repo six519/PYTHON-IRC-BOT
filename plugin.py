@@ -31,6 +31,13 @@ class Plugin:
             return self.conf.get(section, cfg)
         except ConfigParser.NoSectionError:
             return None
+    def getConfigBoolean(self, section, cfg = None):
+        try:
+            if cfg == None:
+                return self.conf.getboolean(section)
+            return self.conf.getboolean(section, cfg)
+        except ConfigParser.NoSectionError:
+            return None
     def setConfig(self, cfg):
         self.conf = cfg
     def init(self, irc):

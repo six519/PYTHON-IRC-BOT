@@ -98,31 +98,33 @@ class PYTHONIRC:
 
             else:
                 self.notifyPlugins("onRecv", buffer)
-                if re.search("Checking Ident",buffer) and not self.isAuthenticated:
+                if re.search("Checking Ident", buffer) and not self.isAuthenticated:
                     self.sendMessage("NICK " + self.IrcNick + "\r\n")
                     self.sendMessage("USER " + self.IrcNick + " \"" + self.IrcNick + ".com\" \"" + self.IrcServer + "\" :" + self.IrcNick + " robot\r\n")
 
-                elif re.search("Nickname is already in use",buffer) and not self.isAuthenticated:
+                elif re.search("Nickname is already in use", buffer) and not self.isAuthenticated:
                     self.IrcNick = self.__getUserInput("Please enter new Irc nick")
                     self.sendMessage("NICK " + self.IrcNick + "\r\n")
                     self.sendMessage("USER " + self.IrcNick + " \"" + self.IrcNick + ".com\" \"" + self.IrcServer + "\" :" + self.IrcNick + " robot\r\n")
-                elif re.search("Erroneous Nickname",buffer) and not self.isAuthenticated:
+                elif re.search("Erroneous Nickname", buffer) and not self.isAuthenticated:
                     self.IrcNick = self.__getUserInput("Please enter new Irc nick")
                     self.sendMessage("NICK " + self.IrcNick + "\r\n")
-                    self.sendMessage("USER " + self.IrcNick + " \"" + self.IrcNick + ".com\" \"" + self.IrcServer + "\" :" + self.IrcNick + " robot\r\n")                    
-                elif re.search("This nickname is registered",buffer) and not self.isAuthenticated:
+                    self.sendMessage("USER " + self.IrcNick + " \"" + self.IrcNick + ".com\" \"" + self.IrcServer + "\" :" + self.IrcNick + " robot\r\n")
+                elif re.search("This nickname is registered", buffer) and not self.isAuthenticated:
                     self.IrcNick = self.__getUserInput("Please enter new Irc nick")
                     self.sendMessage("NICK " + self.IrcNick + "\r\n")
                     self.sendMessage("USER " + self.IrcNick + " \"" + self.IrcNick + ".com\" \"" + self.IrcServer + "\" :" + self.IrcNick + " robot\r\n")
 
-                elif re.search("End of /MOTD command",buffer) and not self.isAuthenticated:
+                elif re.search("End of /MOTD command", buffer) and not self.isAuthenticated:
                     self.isAuthenticated = True
                     self.sendMessage("JOIN #" + self.IrcRoom + "\r\n")
 
-                elif re.search("PING :",buffer):
+                elif re.search("PING :", buffer):
                     self.sendMessage(buffer.replace("PING","PONG"))
 
-                elif re.search("PRIVMSG #" + self.IrcRoom + " :",buffer):
+                elif re.match(":(?P<nick>.*?)!\S+\s+?NOTICE\s+[#]?(?P<channel>[-\w]+)\s+:(?P<message>[^\n\r]+)", buffer):
+                    pass # Bots should generally ignore NOTICEs
+                elif re.search("PRIVMSG #" + self.IrcRoom + " :", buffer):
                     nick = self.__extractNick(buffer)
                     self.notifyPlugins("onPriv", self.IrcRoom, nick, buffer)
                 elif re.search("JOIN :#" + self.IrcRoom,buffer):
